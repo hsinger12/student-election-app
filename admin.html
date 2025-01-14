@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Voting Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard - Voting Results</h1>
+    <div id="login-section">
+        <input type="email" id="admin-email" placeholder="Enter admin email" />
+        <button onclick="verifyAdmin()">Login</button>
+    </div>
+    <div id="results-section" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Candidate</th>
+                    <th>Vote Weight</th>
+                </tr>
+            </thead>
+            <tbody id="results"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const allowedAdmins = ["admin1@crescentschool.org", "admin2@crescentschool.org"];
+
+        function verifyAdmin() {
+            const email = document.getElementById('admin-email').value.trim().toLowerCase();
+            if (allowedAdmins.includes(email)) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('results-section').style.display = 'block';
+                displayResults();
+            } else {
+                alert("Access denied. You are not authorized to view this page.");
+            }
+        }
+
+        function displayResults() {
+            let votes = JSON.parse(localStorage.getItem('votes')) || [];
+            let resultsTable = document.getElementById('results');
+            resultsTable.innerHTML = ""; // Clear existing content
+
+            votes.forEach(vote => {
+                let row = `<tr>
+                    <td>${vote.email}</td>
+                    <td>${vote.candidate}</td>
+                    <td>${vote.weight}</td>
+                </tr>`;
+                resultsTable.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
