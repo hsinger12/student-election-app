@@ -125,7 +125,7 @@
             const voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
 
             // Send vote to Google Sheets with correct headers and method
-            fetch('https://script.google.com/macros/s/AKfycbyi-2L3MyWPGrlO_hYAsu2wOwmFZmFTinQKETyCadX3-t504N108eRy3dMrrAd0SVnmgg/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbxYq4i-SelNbB0OiudXcGxas0ZgB3qkBZ5ve-I7bipgfGbHdunHaeKBgmDT3sgthqWMXQ/exec', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, candidate: selected, weight: voteWeight })
