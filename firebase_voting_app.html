@@ -107,6 +107,11 @@
         }
 
         function submitVote() {
+            if (!selectedCandidate) {
+                alert("Please select a candidate before submitting.");
+                return;
+            }
+
             const user = auth.currentUser;
             const email = user.email;
 
