@@ -57,7 +57,21 @@
     </div>
 
     <script>
-        const candidates = ["Candidate 1", "Candidate 2", "Candidate 3"];
+        const candidates = [
+    "Jackson Rosenhek",
+    "Dario Danieli",
+    "Owen Kotler",
+    "Charlie Curry",
+    "Iliyan Gangani",
+    "Shaunik Mahajan",
+    "Thomas Vesey",
+    "Raheem Ebrahim",
+    "Roan McReynolds",
+    "Benjamin Sheng",
+    "Robbie Muranaka",
+    "Jackson Ding",
+    "Abdul Hussein"
+];
 
         function displayCandidates() {
             const candidatesDiv = document.getElementById("candidates");
@@ -82,12 +96,6 @@
 
             if (!email || !email.includes("@crescentschool.org")) {
                 alert("Please enter a valid school email.");
-                return;
-            }
-
-            // Check if the email has already voted
-            if (emailVotes[email]) {
-                alert("You have already voted. Thank you!");
                 return;
             }
 
@@ -143,10 +151,6 @@
                     alert("There was an error submitting your vote. Please try again.");
                 }
             });
-
-            // Record that the email has voted locally
-            emailVotes[email] = true;
-            localStorage.setItem('emailVotes', JSON.stringify(emailVotes));
         }
     </script>
 </body>
