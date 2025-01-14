@@ -56,6 +56,8 @@ function login() {
         });
 }
 
+window.login = login; // Attach login to the global window object
+
 function showVotingSection() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('voting-section').style.display = 'block';
