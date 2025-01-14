@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crescent Voting</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Vote for Head Boy</h1>
+    <form id="voteForm">
+      <label for="candidate">Choose a candidate:</label>
+      <select id="candidate" name="candidate" required>
+        <option value="candidate1">Candidate 1</option>
+        <option value="candidate2">Candidate 2</option>
+        <option value="candidate3">Candidate 3</option>
+      </select>
+      <button type="submit">Submit Vote</button>
+    </form>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAeeztmEgNqN72PGnhgJtap-1n4LhYbIrI",
+      authDomain: "crescent-voting.firebaseapp.com",
+      projectId: "crescent-voting",
+      storageBucket: "crescent-voting.firebasestorage.app",
+      messagingSenderId: "222562711567",
+      appId: "1:222562711567:web:c763ac15e3d521b9accb7a",
+      measurementId: "G-E99E9ZKED9"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Authenticate anonymously
+    auth.signInAnonymously().catch((error) => {
+      console.error("Authentication error:", error);
+    });
+
+    // Handle form submission
+    document.getElementById('voteForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const candidate = document.getElementById('candidate').value;
+
+      db.collection('votes')
+        .add({ candidate: candidate, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+        .then(() => {
+          alert('Your vote has been submitted successfully!');
+          document.getElementById('voteForm').reset();
+        })
+        .catch((error) => {
+          console.error('Error submitting vote:', error);
+          alert('Failed to submit your vote. Please try again.');
+        });
+    });
+  </script>
+</body>
+</html>
