@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Voting Results</title>
+</head>
+<body>
+  <div id="container">
+    <h1>Voting Results</h1>
+    <div id="results"></div>
+    <button id="logout">Logout</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    auth.onAuthStateChanged((user) => {
+      if (user && ['hsinger@crescentschool.org', 'ahunter@crescentschool.org', 'rprosser@crescentschool.org'].includes(user.email)) {
+        db.collection('votes').get().then((snapshot) => {
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const resultItem = document.createElement('p');
+            resultItem.textContent = `Email: ${data.email}, Candidate: ${data.candidate}`;
+            document.getElementById('results').appendChild(resultItem);
+          });
+        });
+      } else {
+        alert('You do not have permission to view this page.');
+        window.location.href = 'index.html';
+      }
+    });
+
+    document.getElementById('logout').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+</html>

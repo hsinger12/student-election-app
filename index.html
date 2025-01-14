@@ -3,21 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crescent Voting</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Crescent School Voting</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Vote for Head Boy</h1>
-    <form id="voteForm">
-      <label for="candidate">Choose a candidate:</label>
-      <select id="candidate" name="candidate" required>
+  <div id="container">
+    <h1>Crescent School Voting</h1>
+    
+    <div id="login-form">
+      <h2>Sign In</h2>
+      <button id="login">Sign In with Google</button>
+    </div>
+
+    <div id="vote-form" style="display: none;">
+      <h2>Vote for Head Boy</h2>
+      <select id="candidate">
         <option value="candidate1">Candidate 1</option>
         <option value="candidate2">Candidate 2</option>
         <option value="candidate3">Candidate 3</option>
       </select>
-      <button type="submit">Submit Vote</button>
-    </form>
+      <button id="submit-vote">Submit Vote</button>
+      <button id="logout">Logout</button>
+    </div>
   </div>
 
   <!-- Firebase SDKs -->
@@ -28,40 +34,64 @@
   <script>
     // Your Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyAeeztmEgNqN72PGnhgJtap-1n4LhYbIrI",
-      authDomain: "crescent-voting.firebaseapp.com",
-      projectId: "crescent-voting",
-      storageBucket: "crescent-voting.firebasestorage.app",
-      messagingSenderId: "222562711567",
-      appId: "1:222562711567:web:c763ac15e3d521b9accb7a",
-      measurementId: "G-E99E9ZKED9"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Authenticate anonymously
-    auth.signInAnonymously().catch((error) => {
-      console.error("Authentication error:", error);
-    });
+    // Sign in with Google handler
+    document.getElementById('login').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          const emailDomain = user.email.split('@')[1];
 
-    // Handle form submission
-    document.getElementById('voteForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const candidate = document.getElementById('candidate').value;
-
-      db.collection('votes')
-        .add({ candidate: candidate, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
-        .then(() => {
-          alert('Your vote has been submitted successfully!');
-          document.getElementById('voteForm').reset();
+          if (emailDomain === 'crescentschool.org') {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('vote-form').style.display = 'block';
+          } else {
+            alert('You must use a Crescent School account to sign in.');
+            auth.signOut();
+          }
         })
         .catch((error) => {
-          console.error('Error submitting vote:', error);
-          alert('Failed to submit your vote. Please try again.');
+          alert('Error: ' + error.message);
         });
+    });
+
+    // Submit vote handler
+    document.getElementById('submit-vote').addEventListener('click', () => {
+      const candidate = document.getElementById('candidate').value;
+      const user = auth.currentUser;
+
+      db.collection('votes').doc(user.uid).set({
+        email: user.email,
+        candidate: candidate,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert('Vote submitted successfully!');
+      })
+      .catch((error) => {
+        alert('Error submitting vote: ' + error.message);
+      });
+    });
+
+    // Logout handler
+    document.getElementById('logout').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('vote-form').style.display = 'none';
+      });
     });
   </script>
 </body>
