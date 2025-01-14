@@ -110,7 +110,7 @@
             const voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
 
             // Send vote to Google Sheets
-            fetch('https://script.google.com/a/macros/crescentschool.org/s/AKfycbyXO1wynq3sfP6pS1IM9xK1Wbyn9sfuxAvMtulP_lQvE8yEsIm4Lg4Qk7UDlCq9XCPjXg/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbyi-2L3MyWPGrlO_hYAsu2wOwmFZmFTinQKETyCadX3-t504N108eRy3dMrrAd0SVnmgg/exec', {
                 method: 'POST',
                 body: JSON.stringify({ email: email, candidate: selected, weight: voteWeight }),
                 headers: { 'Content-Type': 'application/json' }
