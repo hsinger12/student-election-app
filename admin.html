@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - View Votes</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <h1>Admin Panel - View Votes</h1>
+    <div id="votes-list"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBwCbqEa067I5BvS6mX_ZjiQw4EVfpzhQ0",
+            authDomain: "crescent-votes.firebaseapp.com",
+            databaseURL: "https://crescent-votes-default-rtdb.firebaseio.com",
+            projectId: "crescent-votes",
+            storageBucket: "crescent-votes.firebasestorage.app",
+            messagingSenderId: "774613067995",
+            appId: "1:774613067995:web:83cbfee53e2cb5bbbc44fe",
+            measurementId: "G-ZDSLRR64R4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('votes').on('value', (snapshot) => {
+            const votesList = document.getElementById('votes-list');
+            votesList.innerHTML = ''; // Clear previous content
+
+            snapshot.forEach((vote) => {
+                const data = vote.val();
+                const voteItem = document.createElement('div');
+                voteItem.innerText = `Email: ${data.email}, Candidate: ${data.candidate}, Weight: ${data.weight}`;
+                votesList.appendChild(voteItem);
+            });
+        });
+    </script>
+</body>
+</html>
