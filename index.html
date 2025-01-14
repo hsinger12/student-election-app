@@ -51,16 +51,28 @@
 
     <div id="voting-section" class="hidden">
         <h1>Vote for Your Preferred Candidate</h1>
-        <div id="candidates">
-            <div class="candidate" onclick="selectCandidate('Candidate 1')">Candidate 1</div>
-            <div class="candidate" onclick="selectCandidate('Candidate 2')">Candidate 2</div>
-            <div class="candidate" onclick="selectCandidate('Candidate 3')">Candidate 3</div>
-        </div>
+        <div id="candidates"></div>
         <button onclick="submitVote()">Submit Vote</button>
         <p id="confirmation" style="margin-top: 20px; color: green; font-weight: bold;"></p>
     </div>
 
     <script>
+        const candidates = ["Candidate 1", "Candidate 2", "Candidate 3"];
+
+        function displayCandidates() {
+            const candidatesDiv = document.getElementById("candidates");
+            candidatesDiv.innerHTML = ""; // Clear existing content
+            candidates.forEach(candidate => {
+                const candidateDiv = document.createElement("div");
+                candidateDiv.className = "candidate";
+                candidateDiv.innerText = candidate;
+                candidateDiv.onclick = () => selectCandidate(candidate);
+                candidatesDiv.appendChild(candidateDiv);
+            });
+        }
+
+        displayCandidates();
+
         let selected = null;
         let userGrade = null;
         let emailVotes = JSON.parse(localStorage.getItem('emailVotes')) || {};
@@ -93,8 +105,8 @@
             }
 
             // Show voting section and hide login
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('voting-section').classList.remove('hidden');
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('voting-section').style.display = 'block';
         }
 
         function selectCandidate(candidate) {
@@ -113,28 +125,28 @@
                 return;
             }
 
-            // Determine vote weight based on user grade
-            let voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
-
-            // Store the vote in local storage with weight
-            let votes = JSON.parse(localStorage.getItem('votes')) || {};
-            votes[selected] = (votes[selected] || 0) + voteWeight;
-            localStorage.setItem('votes', JSON.stringify(votes));
-
-            // Record that the email has voted
             const email = document.getElementById('email').value.trim().toLowerCase();
+            const voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
+
+            // Send vote to Google Sheets
+            fetch('https://script.google.com/a/macros/crescentschool.org/s/AKfycbwd0N0J9cfHudDIFOvuWpf4bYeNa3MwSYP7G61gGzVaNqDNLvL_RGBn9-LtIQ6iilOmxA/exec', {
+                method: 'POST',
+                body: JSON.stringify({ email: email, candidate: selected, weight: voteWeight })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert("Thank you for voting!");
+                    selected = null;
+                    document.querySelectorAll('.candidate').forEach(el => el.classList.remove('selected'));
+                } else {
+                    alert("There was an error submitting your vote. Please try again.");
+                }
+            });
+
+            // Record that the email has voted locally
             emailVotes[email] = true;
             localStorage.setItem('emailVotes', JSON.stringify(emailVotes));
-
-            // Display confirmation message
-            document.getElementById('confirmation').innerText = "Thank you for voting for " + selected + "!";
-            
-            // Reset selection
-            selected = null;
-            let candidates = document.getElementsByClassName('candidate');
-            for (let i = 0; i < candidates.length; i++) {
-                candidates[i].classList.remove('selected');
-            }
         }
     </script>
 </body>
