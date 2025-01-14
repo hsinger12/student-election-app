@@ -23,6 +23,11 @@
         th {
             background-color: #f4f4f4;
         }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
@@ -42,10 +47,15 @@
             </thead>
             <tbody id="results"></tbody>
         </table>
+        <div id="admin-actions" style="margin-top: 20px;">
+            <h3>Add a New Admin</h3>
+            <input type="email" id="new-admin-email" placeholder="Enter new admin email" />
+            <button onclick="addAdmin()">Add Admin</button>
+        </div>
     </div>
 
     <script>
-        const allowedAdmins = ["hsinger@crescentschool.org", "ahunter@crescentschool.org"];
+        let allowedAdmins = ["hsinger@crescentschool.org", "ahunter@crescentschool.org", "rprosser@crescentschool.org"];
 
         function verifyAdmin() {
             const email = document.getElementById('admin-email').value.trim().toLowerCase();
@@ -71,6 +81,24 @@
                 </tr>`;
                 resultsTable.innerHTML += row;
             });
+        }
+
+        function addAdmin() {
+            const newAdminEmail = document.getElementById('new-admin-email').value.trim().toLowerCase();
+            if (newAdminEmail && !allowedAdmins.includes(newAdminEmail)) {
+                allowedAdmins.push(newAdminEmail);
+                localStorage.setItem('allowedAdmins', JSON.stringify(allowedAdmins)); // Save to local storage
+                alert("New admin added successfully!");
+                document.getElementById('new-admin-email').value = ''; // Clear input
+            } else {
+                alert("Invalid email or admin already exists.");
+            }
+        }
+
+        // Load allowed admins from local storage on page load
+        const storedAdmins = JSON.parse(localStorage.getItem('allowedAdmins'));
+        if (storedAdmins) {
+            allowedAdmins = storedAdmins;
         }
     </script>
 </body>
