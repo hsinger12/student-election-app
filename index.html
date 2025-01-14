@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Election Voting App</title>
+    <script src="grade_mapping.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .candidate {
+            display: inline-block;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            width: 150px;
+            cursor: pointer;
+        }
+        .candidate:hover {
+            background-color: #f0f0f0;
+        }
+        .selected {
+            border: 2px solid #4CAF50;
+        }
+        button, input {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        input {
+            width: 60%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-section">
+        <h1>Login to Vote</h1>
+        <input type="email" id="email" placeholder="Enter your school email" />
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="voting-section" class="hidden">
+        <h1>Vote for Your Preferred Candidate</h1>
+        <div id="candidates">
+            <div class="candidate" onclick="selectCandidate('Candidate 1')">Candidate 1</div>
+            <div class="candidate" onclick="selectCandidate('Candidate 2')">Candidate 2</div>
+            <div class="candidate" onclick="selectCandidate('Candidate 3')">Candidate 3</div>
+        </div>
+        <button onclick="submitVote()">Submit Vote</button>
+        <p id="confirmation" style="margin-top: 20px; color: green; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        let selected = null;
+        let userGrade = null;
+        let emailVotes = JSON.parse(localStorage.getItem('emailVotes')) || {};
+
+        function login() {
+            const email = document.getElementById('email').value.trim().toLowerCase();
+
+            if (!email || !email.includes("@crescentschool.org")) {
+                alert("Please enter a valid school email.");
+                return;
+            }
+
+            // Check if the email has already voted
+            if (emailVotes[email]) {
+                alert("You have already voted. Thank you!");
+                return;
+            }
+
+            // Determine grade based on email
+            for (let grade in gradeMapping) {
+                if (gradeMapping[grade].includes(email)) {
+                    userGrade = grade;
+                    break;
+                }
+            }
+
+            if (!userGrade) {
+                alert("Your email is not recognized as eligible to vote.");
+                return;
+            }
+
+            // Show voting section and hide login
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('voting-section').classList.remove('hidden');
+        }
+
+        function selectCandidate(candidate) {
+            // Deselect previous candidate
+            if (selected) {
+                document.querySelector('.selected').classList.remove('selected');
+            }
+            // Select new candidate
+            selected = candidate;
+            event.target.classList.add('selected');
+        }
+
+        function submitVote() {
+            if (!selected) {
+                alert("Please select a candidate before submitting.");
+                return;
+            }
+
+            // Determine vote weight based on user grade
+            let voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
+
+            // Store the vote in local storage with weight
+            let votes = JSON.parse(localStorage.getItem('votes')) || {};
+            votes[selected] = (votes[selected] || 0) + voteWeight;
+            localStorage.setItem('votes', JSON.stringify(votes));
+
+            // Record that the email has voted
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            emailVotes[email] = true;
+            localStorage.setItem('emailVotes', JSON.stringify(emailVotes));
+
+            // Display confirmation message
+            document.getElementById('confirmation').innerText = "Thank you for voting for " + selected + "!";
+            
+            // Reset selection
+            selected = null;
+            let candidates = document.getElementsByClassName('candidate');
+            for (let i = 0; i < candidates.length; i++) {
+                candidates[i].classList.remove('selected');
+            }
+        }
+    </script>
+</body>
+</html>
