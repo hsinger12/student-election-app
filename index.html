@@ -57,7 +57,9 @@
     </div>
 
     <script>
-        const candidates = ["Candidate 1", "Candidate 2", "Candidate 3"];
+        const candidates = ["Jackson Rosenhek", "Dario Danieli", "Owen Kotler", "Charlie Curry", "Iliyan Gangani",
+                            "Shaunik Mahajan", "Thomas Vesey", "Raheem Ebrahim", "Roan McReynolds", "Benjamin Sheng",
+                            "Robbie Muranaka", "Jackson Ding", "Abdul Hussein"];
 
         function displayCandidates() {
             const candidatesDiv = document.getElementById("candidates");
@@ -74,27 +76,12 @@
         displayCandidates();
 
         let selected = null;
-        let userGrade = null;
-        let emailVotes = JSON.parse(localStorage.getItem('emailVotes')) || {};
 
         function login() {
             const email = document.getElementById('email').value.trim().toLowerCase();
 
             if (!email || !email.includes("@crescentschool.org")) {
                 alert("Please enter a valid school email.");
-                return;
-            }
-
-            // Determine grade based on email
-            for (let grade in gradeMapping) {
-                if (gradeMapping[grade].includes(email)) {
-                    userGrade = grade;
-                    break;
-                }
-            }
-
-            if (!userGrade) {
-                alert("Your email is not recognized as eligible to vote.");
                 return;
             }
 
@@ -123,20 +110,24 @@
             const voteWeight = (userGrade === 'grade-11' || userGrade === 'staff') ? 2 : 1;
 
             // Send vote to Google Sheets
-            fetch('https://script.google.com/a/macros/crescentschool.org/s/AKfycbwtqIPQ7_379AmsWsPHrEyzs8PnX_zw1k9FmzcNmLty8rhorBN6D7G0dgHifc8p14YSjA/exec', {
+            fetch('https://script.google.com/a/macros/crescentschool.org/s/AKfycbyXO1wynq3sfP6pS1IM9xK1Wbyn9sfuxAvMtulP_lQvE8yEsIm4Lg4Qk7UDlCq9XCPjXg/exec', {
                 method: 'POST',
-                body: JSON.stringify({ email: email, candidate: selected, weight: voteWeight })
+                body: JSON.stringify({ email: email, candidate: selected, weight: voteWeight }),
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     alert("Thank you for voting!");
-                    selected = null;
-                    document.querySelectorAll('.candidate').forEach(el => el.classList.remove('selected'));
+                    document.getElementById('confirmation').innerText = "Your vote has been recorded.";
+                    document.getElementById('voting-section').style.display = 'none';
+                } else if (data.message === 'Already voted') {
+                    alert("You have already voted. Only one vote is allowed per student.");
                 } else {
                     alert("There was an error submitting your vote. Please try again.");
                 }
-            });
+            })
+            .catch(error => console.error('Error:', error));
         }
     </script>
 </body>
